@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>نظام الاستعلام عن النتائج - مهارات رقمية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Tajawal", sans-serif;
+        background-color: #f8fafc;
+      }
+      .loader {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #1e3a8a;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .hidden {
+        display: none;
+      }
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        body {
+          background: white;
+          -webkit-print-color-adjust: exact;
+        }
+        .print-container {
+          box-shadow: none;
+          max-width: 100%;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen py-8 px-4">
+    <script>
+      // ==========================================
+      // 🔴 هام: الصق رابط Google Apps Script هنا
+      // ==========================================
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbzESLsYHwdSikh2gc0EQyeazPZaqDhauHowKlsWP_vTVugq_Md7kXiKX7-mPi_wdtKe/exec";
+    </script>
+
+    <div
+      id="searchBox"
+      class="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 no-print transition-all duration-300"
+    >
+      <div class="bg-blue-900 p-6 text-center">
+        <img
+          src="https://sites.moe.gov.sa/assets/images/default-img.jpg"
+          class="h-20 mx-auto mb-3 bg-white rounded-full p-1"
+        />
+        <h2 class="text-white text-xl font-bold">بوابة النتائج المدرسية</h2>
+        <p class="text-blue-200 text-sm">
+          مدرسة غرناطة الابتدائية ـ مادة المهارات الرقمية
+        </p>
+      </div>
+      <div class="p-8">
+        <label class="block text-gray-700 text-sm font-bold mb-2"
+          >رقم هوية الطالب:</label
+        >
+        <input
+          type="text"
+          id="idInput"
+          class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3 text-center"
+          placeholder="S123456789"
+          onkeypress="if (event.keyCode == 13) getResult();"
+        />
+
+        <button
+          onclick="getResult()"
+          id="searchBtn"
+          class="w-full mt-6 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-5 py-3 text-center flex justify-center items-center gap-2 shadow-lg transition-transform transform active:scale-95"
+        >
+          بحث
+        </button>
+        <p
+          id="msg"
+          class="mt-4 text-center text-red-600 text-sm font-bold hidden"
+        ></p>
+      </div>
+    </div>
+
+    <div
+      id="reportBox"
+      class="hidden max-w-[210mm] mx-auto bg-white shadow-2xl min-h-[297mm] p-10 relative print-container rounded-lg mt-4"
+    >
+      <div class="flex justify-end gap-2 mb-6 no-print">
+        <button
+          onclick="window.print()"
+          class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded text-sm flex items-center gap-2"
+        >
+          🖨️ طباعة
+        </button>
+        <button
+          onclick="location.reload()"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm"
+        >
+          بحث جديد
+        </button>
+      </div>
+
+      <div
+        class="flex justify-between items-center border-b-4 border-double border-blue-900 pb-4 mb-6"
+      >
+        <div
+          class="text-center w-1/3 text-sm font-bold text-gray-800 leading-6"
+        >
+          <p>وزارة التعليم</p>
+          <p>الإدارة العامة للتعليم بمنطقة الرياض</p>
+          <p>مدرسة غرناطة الابتدائية</p>
+        </div>
+
+        <div class="text-center w-1/3">
+          <img
+            src="https://moe.gov.sa/Style%20Library/Images/v2030_LightColors.svg"
+            class="h-24 object-contain mx-auto"
+          />
+        </div>
+
+        <div
+          class="text-center w-1/3 text-sm font-bold text-gray-800 leading-6"
+        >
+          <p>الفصل الدراسي الأول</p>
+          <p>المادة: مهارات رقمية</p>
+          <p class="text-xs text-gray-500 mt-1">
+            تاريخ الطباعة: <span id="pDate"></span>
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-center gap-3">
+            <div class="bg-blue-200 p-2 rounded-full text-blue-800">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">اسم الطالب</p>
+              <p class="font-bold text-gray-900 text-lg" id="d_name">--</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="bg-blue-200 p-2 rounded-full text-blue-800">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">رقم الهوية</p>
+              <p class="font-bold text-gray-900 text-lg" id="d_id">--</p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="mt-4 pt-4 border-t border-blue-200 flex justify-between text-sm"
+        >
+          <span>الصف: <b id="d_grade">--</b></span>
+          <span>الفصل: <b id="d_class">--</b></span>
+          <span>العام: <b id="d_year">--</b></span>
+        </div>
+      </div>
+
+      <h3
+        class="font-bold text-gray-800 mb-4 border-r-4 border-blue-900 pr-2 text-lg"
+      >
+        📊 تفاصيل الأداء والدرجات
+      </h3>
+      <div id="gradesGrid" class="grid grid-cols-2 gap-4 mb-8"></div>
+
+      <div class="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded mb-10">
+        <h4 class="font-bold text-gray-800 mb-1 flex items-center gap-2">
+          <span>📝</span> ملحوظات وتوصيات المعلم:
+        </h4>
+        <p class="text-gray-700 text-sm leading-relaxed" id="d_notes">...</p>
+      </div>
+
+      <div class="flex justify-between items-end px-6 mt-auto pt-10">
+        <div class="text-center">
+          <p class="font-bold text-sm text-gray-500 mb-2">معلم المادة</p>
+          <p class="font-bold text-blue-900">أ. عبدالله بن رشيد الدريبي</p>
+        </div>
+        <div class="text-center">
+          <p class="font-bold text-sm text-gray-500 mb-2">مدير المدرسة</p>
+          <p class="font-bold text-gray-300">..................</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("pDate").innerText =
+        new Date().toLocaleDateString("ar-SA");
+
+      async function getResult() {
+        const id = document.getElementById("idInput").value.trim();
+        const btn = document.getElementById("searchBtn");
+        const msg = document.getElementById("msg");
+
+        if (!id) {
+          msg.innerText = "أدخل رقم الهوية";
+          msg.classList.remove("hidden");
+          return;
+        }
+        if (API_URL.includes("ضع_الرابط")) {
+          alert("تنبيه: لم يتم وضع رابط السكربت في الكود!");
+          return;
+        }
+
+        // Loading state
+        btn.innerHTML = '<div class="loader"></div> جاري البحث...';
+        btn.disabled = true;
+        msg.classList.add("hidden");
+
+        try {
+          // إضافة معامل لكسر الكاش (t=...)
+          const res = await fetch(`${API_URL}?id=${id}&t=${Date.now()}`);
+          const json = await res.json();
+
+          if (json.status === "success") {
+            showData(json.data);
+          } else {
+            msg.innerText = json.message || "لم يتم العثور على الطالب";
+            msg.classList.remove("hidden");
+            btn.innerHTML = "بحث";
+            btn.disabled = false;
+          }
+        } catch (err) {
+          msg.innerText = "حدث خطأ في الاتصال، حاول مرة أخرى";
+          msg.classList.remove("hidden");
+          console.error(err);
+          btn.innerHTML = "بحث";
+          btn.disabled = false;
+        }
+      }
+
+      function showData(data) {
+        document.getElementById("searchBox").classList.add("hidden");
+        document.getElementById("reportBox").classList.remove("hidden");
+
+        // البيانات الأساسية (تطابق الأسماء مع ملفك CSV)
+        document.getElementById("d_name").innerText =
+          data["اسم الطالب"] || data["الاسم"] || "---";
+        document.getElementById("d_id").innerText = data["رقم الهوية"] || "---";
+        document.getElementById("d_grade").innerText = data["الصف"] || "---";
+        document.getElementById("d_class").innerText = data["الفصل"] || "---";
+        document.getElementById("d_year").innerText =
+          data["العام الدراسي"] || "---";
+
+        // الملاحظات
+        // لاحظت في ملفك الاسم: " ملحوظات وتوصيات المعلم"
+        // الكود ينظف المسافات لذا سيبحث عن "ملحوظات وتوصيات المعلم"
+        document.getElementById("d_notes").innerText =
+          data["ملحوظات وتوصيات المعلم"] || "لا توجد ملاحظات";
+
+        // استثناء الحقول التي ظهرت في الأعلى
+        const exclude = [
+          "رقم الهوية",
+          "اسم الطالب",
+          "الصف",
+          "الفصل",
+          "عدد",
+          "المادة",
+          "العام الدراسي",
+          "ملحوظات وتوصيات المعلم",
+        ];
+
+        const grid = document.getElementById("gradesGrid");
+        grid.innerHTML = "";
+
+        for (let key in data) {
+          if (!exclude.includes(key) && data[key] !== "") {
+            // تصميم البطاقة
+            let val = data[key];
+            let colorClass = "text-gray-800";
+
+            // تلوين التقديرات
+            if (String(val).includes("ممتاز")) colorClass = "text-green-600";
+            if (String(val).includes("ضعيف")) colorClass = "text-red-600";
+            if (String(val).includes("مقبول")) colorClass = "text-orange-500";
+
+            let card = `
+                        <div class="border border-gray-200 rounded-lg p-3 bg-gray-50 flex flex-col justify-between">
+                            <h5 class="text-xs font-bold text-gray-500 mb-2 leading-relaxed">${key}</h5>
+                            <p class="text-lg font-bold ${colorClass} text-center">${val}</p>
+                        </div>
+                    `;
+            grid.innerHTML += card;
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
