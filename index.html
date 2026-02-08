@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>نظام الاستعلام عن النتائج - مهارات رقمية</title>
+    <title>نظام الاستعلام عن تقرير - مهارات رقمية</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -59,10 +59,9 @@
       // 🔴 هام: الصق رابط Google Apps Script هنا
       // ==========================================
       const API_URL =
-        "https://script.google.com/macros/s/AKfycbxIpONntis53-ZT1feNkH0LfBIGDyEY3pcAIgcwBcpFpms_7tVnxMj-2oY3s7Tnr3F3/exec";
+        "https://script.google.com/macros/s/AKfycbwITmhy1SfN6A-kR3Nnw1-mG28ScgGiwiPFZ4Z5jNrGgnr0Ppc46kCZqsllPlIquLeb/exec";
     </script>
 
-    <div
     <div
       id="searchBox"
       class="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 no-print transition-all duration-300"
@@ -216,9 +215,16 @@
       </h3>
       <div id="gradesGrid" class="grid grid-cols-2 gap-4 mb-8"></div>
 
-      <div class="bg-blue-50 border-r-4 border-blue-600 p-4 rounded mb-10">
+      <div class="bg-blue-50 border-r-4 border-blue-600 p-4 rounded mb-4">
         <h4 class="font-bold text-gray-800 mb-1 flex items-center gap-2">
           <span>📝</span> الواجبات الأسبوعية والمهام الأدائية:
+        </h4>
+        <p class="text-gray-700 text-sm leading-relaxed" id="d_homework">...</p>
+      </div>
+
+      <div class="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded mb-10">
+        <h4 class="font-bold text-gray-800 mb-1 flex items-center gap-2">
+          <span>💡</span> ملحوظات وتوصيات المعلم:
         </h4>
         <p class="text-gray-700 text-sm leading-relaxed" id="d_notes">...</p>
       </div>
@@ -228,7 +234,7 @@
           <p class="font-bold text-sm text-gray-500 mb-2">معلم المادة</p>
           <p class="font-bold text-blue-900">أ. عبدالله بن رشيد الدريبي</p>
         </div>
-          <div class="text-center">
+        <div class="text-center">
           <p class="font-bold text-sm text-gray-500 mb-2">مدير المدرسة</p>
           <p class="font-bold text-sm text-gray-500 mb-2">فهد بن سعد الشهري</p>
         </div>
@@ -285,7 +291,7 @@
         document.getElementById("searchBox").classList.add("hidden");
         document.getElementById("reportBox").classList.remove("hidden");
 
-        // البيانات الأساسية (تطابق الأسماء مع ملفك CSV)
+        // البيانات الأساسية
         document.getElementById("d_name").innerText =
           data["اسم الطالب"] || data["الاسم"] || "---";
         document.getElementById("d_id").innerText = data["رقم الهوية"] || "---";
@@ -295,17 +301,24 @@
           data["العام الدراسي"] || "---";
 
         // ==========================================
-        // 🛠️ تم التعديل لجلب العمود الجديد للواجبات
+        // 1. جلب الواجبات
+        // ==========================================
+        let homeworkText =
+          data["الواجبات الأسبوعية والمهام الأدائية"] ||
+          "لا توجد واجبات أو مهام مسجلة حالياً";
+        document.getElementById("d_homework").innerText = homeworkText;
+
+        // ==========================================
+        // 2. جلب الملاحظات
         // ==========================================
         let notesText =
-          data["الواجبات الأسبوعية والمهام الأدائية"] ||
-          data["ملحوظات وتوصيات المعلم"] || // نبقي القديم احتياطاً
-          "لا توجد واجبات أو مهام مسجلة حالياً";
-
+          data["ملحوظات وتوصيات المعلم"] ||
+          data["ملحوظات وتوصيات المعلم:"] ||
+          "لا توجد ملاحظات";
         document.getElementById("d_notes").innerText = notesText;
 
         // ==========================================
-        // 🛠️ قائمة الاستبعاد (تم تحديثها لمنع ظهور الواجبات كدرجة)
+        // 3. قائمة الاستبعاد (إخفاء الواجبات والملاحظات من الدرجات)
         // ==========================================
         const exclude = [
           "رقم الهوية",
@@ -317,7 +330,7 @@
           "العام الدراسي",
           "ملحوظات وتوصيات المعلم",
           "ملحوظات وتوصيات المعلم:",
-          "الواجبات الأسبوعية والمهام الأدائية", // الاسم الجديد
+          "الواجبات الأسبوعية والمهام الأدائية",
         ];
 
         const grid = document.getElementById("gradesGrid");
@@ -325,11 +338,9 @@
 
         for (let key in data) {
           if (!exclude.includes(key) && data[key] !== "") {
-            // تصميم البطاقة
             let val = data[key];
             let colorClass = "text-gray-800";
 
-            // تلوين التقديرات
             if (String(val).includes("ممتاز")) colorClass = "text-green-600";
             if (String(val).includes("ضعيف")) colorClass = "text-red-600";
             if (String(val).includes("مقبول")) colorClass = "text-orange-500";
