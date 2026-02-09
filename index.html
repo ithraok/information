@@ -1,10 +1,9 @@
-
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>نظام الاستعلام عن تقرير - مهارات رقمية</title>
+    <title>نظام الاستعلام عن النتائج - مهارات رقمية</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -56,10 +55,10 @@
   <body class="min-h-screen py-8 px-4">
     <script>
       // ==========================================
-      // 🔴 هام: الصق رابط Google Apps Script هنا
+      // 🔴 هام: رابط السكربت الخاص بك
       // ==========================================
       const API_URL =
-        "https://script.google.com/macros/s/AKfycbwITmhy1SfN6A-kR3Nnw1-mG28ScgGiwiPFZ4Z5jNrGgnr0Ppc46kCZqsllPlIquLeb/exec";
+        "https://script.google.com/macros/s/AKfycbxjjNWLq0R9Te2-Gv-bKgjf-Of1KhAcTPzSiGECDsKmiJ3ZsUBdacbrxAz2tFMTUp0O/exec";
     </script>
 
     <div
@@ -71,7 +70,7 @@
           src="https://sites.moe.gov.sa/assets/images/default-img.jpg"
           class="h-20 mx-auto mb-3 bg-white rounded-full p-1"
         />
-        <h2 class="text-white text-xl font-bold">
+ <h2 class="text-white text-xl font-bold">
           تقارير مادة/ المهارات الرقمية
         </h2>
         <p class="text-blue-200 text-sm">
@@ -238,7 +237,6 @@
           <p class="font-bold text-sm text-gray-500 mb-2">مدير المدرسة</p>
           <p class="font-bold text-sm text-gray-500 mb-2">فهد بن سعد الشهري</p>
         </div>
-      </div>
     </div>
 
     <script>
@@ -300,26 +298,20 @@
         document.getElementById("d_year").innerText =
           data["العام الدراسي"] || "---";
 
-        // ==========================================
-        // 1. جلب الواجبات
-        // ==========================================
+        // الواجبات
         let homeworkText =
           data["الواجبات الأسبوعية والمهام الأدائية"] ||
           "لا توجد واجبات أو مهام مسجلة حالياً";
         document.getElementById("d_homework").innerText = homeworkText;
 
-        // ==========================================
-        // 2. جلب الملاحظات
-        // ==========================================
+        // الملاحظات
         let notesText =
           data["ملحوظات وتوصيات المعلم"] ||
           data["ملحوظات وتوصيات المعلم:"] ||
           "لا توجد ملاحظات";
         document.getElementById("d_notes").innerText = notesText;
 
-        // ==========================================
-        // 3. قائمة الاستبعاد (إخفاء الواجبات والملاحظات من الدرجات)
-        // ==========================================
+        // قائمة الاستبعاد
         const exclude = [
           "رقم الهوية",
           "اسم الطالب",
@@ -339,18 +331,50 @@
         for (let key in data) {
           if (!exclude.includes(key) && data[key] !== "") {
             let val = data[key];
-            let colorClass = "text-gray-800";
 
-            if (String(val).includes("ممتاز")) colorClass = "text-green-600";
-            if (String(val).includes("ضعيف")) colorClass = "text-red-600";
-            if (String(val).includes("مقبول")) colorClass = "text-orange-500";
+            // ==========================================
+            // ⭐ نظام النجمتين المطور
+            // ==========================================
+            let isDoubleStar = key.includes("**"); // نجمتين (أخضر)
+            let isSingleStar = !isDoubleStar && key.includes("*"); // نجمة واحدة (أحمر)
+
+            // تنظيف الاسم للعرض
+            let displayKey = key.replace(/\*\*/g, "").replace(/\*/g, "").trim();
+
+            // تحديد الستايل
+            let containerStyle = "border border-gray-200 bg-gray-50"; // الافتراضي
+            let titleStyle = "text-gray-500 font-bold";
+            let icon = "";
+
+            if (isDoubleStar) {
+              // 🟢 ستايل النجمتين (أخضر - تميز)
+              containerStyle =
+                "border-2 border-green-500 bg-green-50 shadow-md transform scale-105";
+              titleStyle = "text-green-800 font-extrabold";
+              icon = "🌟";
+            } else if (isSingleStar) {
+              // 🔴 ستايل النجمة الواحدة (أحمر - تنبيه)
+              containerStyle =
+                "border-2 border-red-500 bg-red-50 shadow-md transform scale-105";
+              titleStyle = "text-red-800 font-extrabold";
+              icon = "⚠️";
+            }
+
+            // تلوين القيم
+            let valColor = "text-gray-800";
+            if (String(val).includes("ممتاز")) valColor = "text-green-600";
+            if (String(val).includes("ضعيف")) valColor = "text-red-600";
+            if (String(val).includes("مقبول")) valColor = "text-orange-500";
 
             let card = `
-                        <div class="border border-gray-200 rounded-lg p-3 bg-gray-50 flex flex-col justify-between">
-                            <h5 class="text-xs font-bold text-gray-500 mb-2 leading-relaxed">${key}</h5>
-                            <p class="text-lg font-bold ${colorClass} text-center">${val}</p>
-                        </div>
-                    `;
+                <div class="${containerStyle} rounded-lg p-3 flex flex-col justify-between transition-all">
+                    <h5 class="text-xs ${titleStyle} mb-2 leading-relaxed flex justify-between items-center">
+                        ${displayKey}
+                        <span>${icon}</span>
+                    </h5>
+                    <p class="text-lg font-bold ${valColor} text-center">${val}</p>
+                </div>
+            `;
             grid.innerHTML += card;
           }
         }
