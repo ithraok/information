@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
@@ -70,12 +71,11 @@
           src="https://sites.moe.gov.sa/assets/images/default-img.jpg"
           class="h-20 mx-auto mb-3 bg-white rounded-full p-1"
         />
- <h2 class="text-white text-xl font-bold">
+        <h2 class="text-white text-xl font-bold">
           تقارير مادة/ المهارات الرقمية
+          <p class="text-white text-sm">سجل متابعة لولي الأمر يحدث أسبوعيا</p>
         </h2>
-        <p class="text-blue-200 text-sm">
-          "سجل متابعة لولي الأمر يحدث أسبوعيا"
-        </p>
+        <p class="text-blue-200 text-sm">لطلاب الصف الخامس والسادس</p>
         <p class="text-blue-200 text-sm">مدرسة غرناطة الابتدائية</p>
         <p class="text-blue-200 text-sm">المعلم / عبدالله بن رشيد الدريبي</p>
       </div>
@@ -107,7 +107,7 @@
 
     <div
       id="reportBox"
-      class="hidden max-w-[210mm] mx-auto bg-white shadow-2xl min-h-[297mm] p-10 relative print-container rounded-lg mt-4"
+      class="hidden max-w-[210mm] mx-auto bg-white shadow-2xl min-h-[297mm] p-10 relative print-container rounded-lg mt-4 flex flex-col"
     >
       <div class="flex justify-end gap-2 mb-6 no-print">
         <button
@@ -129,9 +129,11 @@
       >
         <div
           class="text-center w-1/3 text-sm font-bold text-gray-800 leading-6"
+          class="text-center w-1/3 text-xs font-bold text-gray-800 leading-6"
         >
           <p>وزارة التعليم</p>
-          <p>الإدارة العامة للتعليم بمنطقة الرياض</p>
+          <p>الإدارة العامة للتعليم</p>
+          <p>بمنطقة الرياض</p>
           <p>مدرسة غرناطة الابتدائية</p>
         </div>
 
@@ -235,8 +237,25 @@
         </div>
         <div class="text-center">
           <p class="font-bold text-sm text-gray-500 mb-2">مدير المدرسة</p>
-          <p class="font-bold text-sm text-gray-500 mb-2">فهد بن سعد الشهري</p>
+          <p class="font-extrabold text-sm text-black mb-2">
+            فهد بن سعد الشهري
+          </p>
         </div>
+      </div>
+      <footer
+        id="quizFooter"
+        class="text-center text-xs text-gray-500 mt-8 pt-4 border-t border-gray-200"
+      >
+        مبادرة تعليمية – مبادرة وتصميم: عبدالله بن رشيد الدريبي مدرسة غرناطة
+        الابتدائية - العام الدراسي 1447هـ ، للتواصل:
+        <a
+          href="https://x.com/AbuRasheed12"
+          target="_blank"
+          class="text-blue-600 hover:underline"
+          >https://x.com/AbuRasheed12</a
+        >
+        ، t237265@rb.moe.gov.sa
+      </footer>
     </div>
 
     <script>
@@ -343,7 +362,7 @@
 
             // تحديد الستايل
             let containerStyle = "border border-gray-200 bg-gray-50"; // الافتراضي
-            let titleStyle = "text-gray-500 font-bold";
+            let titleStyle = "text-black font-extrabold";
             let icon = "";
 
             if (isDoubleStar) {
