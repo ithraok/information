@@ -128,7 +128,6 @@
       >
         <div
           class="text-center w-1/3 text-sm font-bold text-gray-800 leading-6"
-          class="text-center w-1/3 text-xs font-bold text-gray-800 leading-6"
         >
           <p>وزارة التعليم</p>
           <p>الإدارة العامة للتعليم</p>
@@ -349,31 +348,58 @@
             let val = data[key];
 
             // ==========================================
-            // ⭐ نظام النجمتين المطور
+            // ⭐ نظام العلامات والألوان الخماسي
             // ==========================================
-            let isDoubleStar = key.includes("**"); // نجمتين (أخضر)
-            let isSingleStar = !isDoubleStar && key.includes("*"); // نجمة واحدة (أحمر)
+            let isDoubleStar = key.includes("**");
+            let isSingleStar = !isDoubleStar && key.includes("*");
+            let isHash = key.includes("#");
+            let isAt = key.includes("@");
+            let isDollar = key.includes("$");
 
-            // تنظيف الاسم للعرض
-            let displayKey = key.replace(/\*\*/g, "").replace(/\*/g, "").trim();
+            // تنظيف الاسم للعرض (حذف جميع الرموز المبرمجة)
+            let displayKey = key
+              .replace(/\*\*/g, "")
+              .replace(/\*/g, "")
+              .replace(/#/g, "")
+              .replace(/@/g, "")
+              .replace(/\$/g, "")
+              .trim();
 
-            // تحديد الستايل
-            let containerStyle = "border border-gray-200 bg-gray-50"; // الافتراضي
+            // تحديد الستايل الافتراضي
+            let containerStyle = "border border-gray-200 bg-gray-50";
             let titleStyle = "text-black font-extrabold";
             let icon = "";
 
             if (isDoubleStar) {
-              // 🟢 ستايل النجمتين (أخضر - تميز)
+              // 🟢 ستايل النجمتين (أخضر)
               containerStyle =
                 "border-2 border-green-500 bg-green-50 shadow-md transform scale-105";
               titleStyle = "text-green-800 font-extrabold";
               icon = "🌟";
             } else if (isSingleStar) {
-              // 🔴 ستايل النجمة الواحدة (أحمر - تنبيه)
+              // 🔴 ستايل النجمة الواحدة (أحمر)
               containerStyle =
                 "border-2 border-red-500 bg-red-50 shadow-md transform scale-105";
               titleStyle = "text-red-800 font-extrabold";
               icon = "⚠️";
+            } else if (isHash) {
+              // 🔵 ستايل الهاشتاج (أزرق)
+              containerStyle =
+                "border-2 border-blue-500 bg-blue-50 shadow-md transform scale-105";
+              titleStyle = "text-blue-800 font-extrabold";
+              icon = "📘";
+            } else if (isAt) {
+              // 🟣 ستايل الآت (بنفسجي)
+              containerStyle =
+                "border-2 border-purple-500 bg-purple-50 shadow-md transform scale-105";
+              titleStyle = "text-purple-800 font-extrabold";
+              icon = "🎯";
+            } else if (isDollar) {
+              // 🟠 ستايل الدولار (برتقالي)
+              containerStyle =
+                "border-2 border-orange-500 bg-orange-50 shadow-md transform scale-105";
+              titleStyle = "text-orange-800 font-extrabold";
+              icon = "🔔";
             }
 
             // تلوين القيم
